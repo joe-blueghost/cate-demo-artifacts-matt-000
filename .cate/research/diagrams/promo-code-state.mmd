@@ -1,0 +1,21 @@
+stateDiagram-v2
+    [*] --> NoCode: Initial state
+
+    NoCode --> Validating: applyPromoCode(code)
+    Validating --> Applied: Code valid + subtotal qualifies
+    Validating --> Error: Code invalid or subtotal too low
+
+    Applied --> NoCode: removePromoCode()
+    Error --> Validating: applyPromoCode(newCode)
+    Error --> NoCode: Clear error
+
+    state Applied {
+        [*] --> DiscountActive
+        DiscountActive: discount computed from code
+        DiscountActive: total = subtotal - discount + shipping
+    }
+
+    state Error {
+        [*] --> ShowError
+        ShowError: promoError message displayed
+    }
