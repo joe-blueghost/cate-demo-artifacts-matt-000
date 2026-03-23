@@ -1,0 +1,30 @@
+sequenceDiagram
+    participant U as User
+    participant V as Vue Page
+    participant S as Pinia Store
+    participant P as PromoCode Map
+
+    U->>V: Enter code + click Apply
+    V->>S: applyPromoCode("SAVE10")
+    S->>P: Look up code
+    alt Code found
+        P-->>S: { type: "percentage", value: 10 }
+        S->>S: Check minSubtotal
+        alt Subtotal qualifies
+            S-->>S: Set appliedPromoCode
+            S-->>V: discount getter updates
+            V-->>U: Show success + discount line
+        else Subtotal too low
+            S-->>V: Set promoError
+            V-->>U: Show error message
+        end
+    else Code not found
+        P-->>S: undefined
+        S-->>V: Set promoError
+        V-->>U: Show "Invalid code" error
+    end
+
+    U->>V: Click Remove
+    V->>S: removePromoCode()
+    S-->>V: discount = 0
+    V-->>U: Show input field again
